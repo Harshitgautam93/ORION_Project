@@ -1,7 +1,7 @@
-🛰️ ORION | Order Risk & Intelligent Optimization Network
-NexGen Logistics Intelligence Command Center
+🛰️ ORION | Order Risk & Intelligent Optimization Network NexGen Logistics Intelligence Command Center
+
 Project Overview
-ORION is an AI-driven decision engine developed for NexGen Logistics Pvt. Ltd. to transform reactive operations into a predictive "Command Center." By unifying 7+ disparate datasets, the project addresses the Tri-Factor Optimization challenge: balancing Profitability, Environmental Sustainability (Carbon), and Customer Lifetime Value (CLV).
+  ORION is an AI-driven decision engine developed for NexGen Logistics Pvt. Ltd. to transform reactive operations into a predictive "Command Center." By unifying 7+    disparate datasets, the project addresses the Tri-Factor Optimization challenge: balancing Profitability, Environmental Sustainability (Carbon), and Customer Lifetime Value (CLV).
 
 Features
 Predictive Risk Modeling: Assigns a failure propensity score to orders based on traffic volatility and historical carrier performance.
