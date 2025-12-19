@@ -59,3 +59,10 @@ Open in Browser: Visit the local URL (usually http://localhost:8501) to access t
 
 Conclusion
 The ORION Control Tower serves as a testament to the power of integrating fragmented data into a cohesive decision-support system. By leveraging Streamlit, Plotly, and PyDeck, the project successfully demonstrates how logistics firms can achieve a 15–20% reduction in operational costs while simultaneously improving their sustainability footprint and customer retention.
+
+<img width="1870" height="757" alt="Screenshot 2025-12-19 104857" src="https://github.com/user-attachments/assets/a41c5c2d-ebdd-4834-b0c2-e25fd91579c2" />
+<img width="1896" height="810" alt="Screenshot 2025-12-19 104833" src="https://github.com/user-attachments/assets/99521131-2cfa-43fc-83ea-ba846b623c65" />
+<img width="1355" height="695" alt="Screenshot 2025-12-19 104738" src="https://github.com/user-attachments/assets/e8899a84-afa5-4843-8148-63c691acecf7" />
+<img width="1866" height="736" alt="Screenshot 2025-12-19 104724" src="https://github.com/user-attachments/assets/d09917f0-c701-4977-bb4d-43234db3ea3d" />
+<img width="1817" height="758" alt="Screenshot 2025-12-19 104702" src="https://github.com/user-attachments/assets/bd975eff-b84d-495b-a058-5a9058e1f1b3" />
+<img width="1358" height="646" alt="Screenshot 2025-12-19 102337" src="https://github.com/user-attachments/assets/8a0b6d64-c70d-4f63-afaa-2bbd13701307" />
