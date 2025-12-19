@@ -50,20 +50,23 @@ def get_data():
 
 df, fleet, inv = get_data()
 
-# --- SAFETY COLUMN FINDER ---
-def get_safe_col(df, target_names, default_name):
+# --- SAFETY COLUMN FINDER (Enhanced) ---
+def get_safe_col(df, target_names, default_name, fill_val=0):
     for c in df.columns:
         if any(t.lower() in c.lower() for t in target_names):
             return c
-    df[default_name] = 0
+    # If not found, create it to prevent crashes
+    df[default_name] = fill_val
     return default_name
 
+# Dynamically detect columns (Fixes the CLV_Score and Name Mismatch issues)
 orig_col = get_safe_col(df, ['origin'], 'Origin')
 prio_col = get_safe_col(df, ['priority'], 'Priority')
-val_col  = get_safe_col(df, ['value', 'order_val'], 'Order_Value')
-dist_col = get_safe_col(df, ['distance'], 'Distance')
-cost_col = get_safe_col(df, ['cost'], 'Costs')
-dest_col = get_safe_col(df, ['destination'], 'Destination')
+val_col  = get_safe_col(df, ['order_value', 'value_inr'], 'Order_Value_INR')
+dist_col = get_safe_col(df, ['distance'], 'distance_km')
+cost_col = get_safe_col(df, ['delivery_cost', 'total_cost'], 'delivery_cost_inr')
+dest_col = get_safe_col(df, ['destination'], 'destination')
+clv_col  = get_safe_col(df, ['clv_score', 'clv'], 'CLV_Score', fill_val=50) # Fixes the crash
 
 # --- SIDEBAR ---
 with st.sidebar:
@@ -77,103 +80,61 @@ with st.sidebar:
 
 filtered_df = df[(df[orig_col] == region) & (df[prio_col].isin(prio_list))].copy()
 
-# --- HEADER & KPIs ---
-# --- KPI SECTION (Inside app.py) ---
-rev_risk = filtered_df[filtered_df['Risk_Level'] == 'High']['Order_Value_INR'].sum()
-total_carbon = filtered_df['Carbon_Impact'].sum()
-# Calculate Recovery % (Orders not at high risk)
-recovery_rate = (len(filtered_df[filtered_df['Risk_Level'] == 'Low']) / len(filtered_df)) * 100
+# --- KPI SECTION ---
+# Use the detected val_col instead of hardcoded strings
+rev_risk = filtered_df[filtered_df['Risk_Level'] == 'High'][val_col].sum() if 'Risk_Level' in filtered_df.columns else 0
+total_carbon = filtered_df['Carbon_Impact'].sum() if 'Carbon_Impact' in filtered_df.columns else 0
+
+# Safe Recovery Calculation
+if 'Risk_Level' in filtered_df.columns and len(filtered_df) > 0:
+    recovery_rate = (len(filtered_df[filtered_df['Risk_Level'] == 'Low']) / len(filtered_df)) * 100
+else:
+    recovery_rate = 100.0
 
 k1, k2, k3 = st.columns(3)
 k1.metric("Revenue at Risk 💰", f"₹{rev_risk:,.0f}")
 k2.metric("Carbon Footprint 🌍", f"{total_carbon:,.2f} kg")
 k3.metric("Service Recovery 🛡️", f"{recovery_rate:.1f}%")
-# --- 🌍 UPDATED MAP SECTION ---
+
+# --- GEOSPATIAL MAP ---
 st.subheader("🌐 Geospatial Carbon & Emission Hotspots")
 
-# Ensure coordinates and weight exist for the map to render
-filtered_df['lat'] = filtered_df.get('lat', 20.59)
-filtered_df['lon'] = filtered_df.get('lon', 78.96)
-# Added map_weight to ensure dots appear even if Carbon_Impact is 0
-filtered_df['map_weight'] = filtered_df['Carbon_Impact'].fillna(0) + 1 
-
-# --- GEOSPATIAL COMMAND CENTER ---
-# Consolidated heading (removes the double-header issue)
-
-# 1. Prepare Data
 map_data = filtered_df.copy()
-map_data['Weight'] = map_data['Carbon_Impact'].fillna(0)
-# Create a high-fidelity tooltip label
-map_data['label'] = map_data['Origin'] + " | Intensity: " + map_data['Weight'].astype(str) + " kg CO2"
+map_data['lat'] = map_data.get('lat', 20.59)
+map_data['lon'] = map_data.get('lon', 78.96)
+map_data['Weight'] = map_data['Carbon_Impact'].fillna(0) if 'Carbon_Impact' in map_data.columns else 1
 
-# 2. Define Interactive "Grid & Heat" Layers
-# LAYER A: The Digital Grid (Adds the 'Axis/Grid' feel)
-grid_layer = pdk.Layer(
-    "ScreenGridLayer",
-    data=map_data,
-    get_position='[lon, lat]',
-    cell_size_pixels=40,
-    color_range=[
-        [0, 123, 255, 30],  # Light Blue (Low Density)
-        [0, 123, 255, 180]  # Deep Blue (High Density)
-    ],
-    pickable=True,
-)
-
-# LAYER B: The Heat Sensor (Thermal Intensity)
+# Map Layers
 heatmap_layer = pdk.Layer(
     "HeatmapLayer",
     data=map_data,
     get_position='[lon, lat]',
     get_weight='Weight',
     radius_pixels=60,
-    intensity=1,
-    threshold=0.03,
-    color_range=[
-        [0, 255, 0, 50],    # Safe (Green)
-        [255, 255, 0, 150],  # Warning (Yellow)
-        [255, 0, 0, 200]     # Critical (Red)
-    ]
 )
 
-# LAYER C: Precision Origin Points
-point_layer = pdk.Layer(
-    "ScatterplotLayer",
-    data=map_data,
-    get_position='[lon, lat]',
-    get_color='[30, 30, 30, 150]', 
-    get_radius=15000,
-    pickable=True,
-)
-
-# 3. Final Render with Map Controls
 st.pydeck_chart(pdk.Deck(
-    # Using 'navigation-day' for the best visible road/grid context
-    map_style='mapbox://styles/mapbox/navigation-day-v1', 
+    map_style='mapbox://styles/mapbox/light-v9', 
     initial_view_state=pdk.ViewState(
         latitude=map_data['lat'].mean() if not map_data.empty else 20.59,
         longitude=map_data['lon'].mean() if not map_data.empty else 78.96,
-        zoom=4.2,
-        pitch=0 # Flat view to make the grid feel like a 2D map axis
+        zoom=4, pitch=0
     ),
-    layers=[grid_layer, heatmap_layer, point_layer],
-    tooltip={
-        "html": "<b>Location:</b> {Origin}<br/><b>Carbon Footprint:</b> {Weight} kg",
-        "style": {"backgroundColor": "#FFFFFF", "color": "#1E1E1E", "fontSize": "14px", "zIndex": "1000"}
-    }
+    layers=[heatmap_layer],
+    tooltip={"html": "<b>Location:</b> {Origin}<br/><b>Emissions:</b> {Weight} kg"}
 ))
 
 # --- DATA VISUALIZATION GRID ---
 col_a, col_b = st.columns([3, 2])
 with col_a:
+    # Uses the clv_col found by the safety helper
     st.plotly_chart(px.scatter(filtered_df, x=dist_col, y=cost_col, 
                                color="Risk_Level" if "Risk_Level" in filtered_df.columns else None, 
-                               size="CLV_Score", title="Risk Propensity Matrix",
+                               size=clv_col, title="Risk Propensity Matrix",
                                template="plotly_white", color_discrete_sequence=["#007BFF", "#FF4B4B"]), use_container_width=True)
 
-    if "CLV_Score" in filtered_df.columns:
-        st.plotly_chart(px.area(filtered_df.sort_values(val_col), x=val_col, y="CLV_Score", 
-                                title="Customer Lifetime Value Density", template="plotly_white"), use_container_width=True)
+    st.plotly_chart(px.area(filtered_df.sort_values(val_col), x=val_col, y=clv_col, 
+                             title="Customer Lifetime Value Density", template="plotly_white"), use_container_width=True)
 
 with col_b:
     if "Risk_Level" in filtered_df.columns:
@@ -183,25 +144,13 @@ with col_b:
     st.plotly_chart(px.bar(inv, x=inv.columns[0], y=inv.columns[1] if len(inv.columns)>1 else inv.columns[0], 
                            title="Warehouse Inventory Health", template="plotly_white", color_discrete_sequence=["#6C757D"]), use_container_width=True)
 
-# --- 🚛 UPDATED FLEET TABLE SECTION ---
+# --- FLEET TABLE ---
 st.divider()
 st.subheader("🚛 Live Fleet Intelligence & Utilization")
-
 if not fleet.empty:
     fleet_tracker = fleet.copy()
-    # Fixed the length mismatch by using the current fleet dataframe length
     fleet_tracker['Utilization'] = np.random.randint(40, 98, size=len(fleet_tracker))
-    fleet_tracker['Status'] = np.random.choice(["✅ On Route", "🅿️ Idle", "🔋 Charging"], size=len(fleet_tracker))
-
-    st.dataframe(
-        fleet_tracker,
-        column_config={
-            "Utilization": st.column_config.ProgressColumn("Fleet Load (%)", min_value=0, max_value=100, format="%d%%"),
-            "Status": st.column_config.TextColumn("Live Status"),
-            "vehicle_type": "Asset Class"
-        },
-        use_container_width=True, hide_index=True
-    )
+    st.dataframe(fleet_tracker, use_container_width=True, hide_index=True)
 
 # --- AI FOOTER ---
 st.markdown('<div class="intervention-box">', unsafe_allow_html=True)
@@ -210,7 +159,7 @@ if "Risk_Level" in filtered_df.columns:
     at_risk = filtered_df[filtered_df['Risk_Level'] == 'High'].head(5)
     if not at_risk.empty:
         st.warning(f"**Intervention Recommended:** {len(at_risk)} high-value deliveries in {region} are at risk.")
-        st.dataframe(at_risk[['Order_ID', dest_col, 'CLV_Score', 'Risk_Level']], use_container_width=True)
+        st.dataframe(at_risk[['Order_ID', dest_col, clv_col, 'Risk_Level']], use_container_width=True)
         if st.button("FIX ALL RISKS NOW"):
             st.balloons()
             st.success("Rerouting Optimized.")
