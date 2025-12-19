@@ -1,87 +1,84 @@
 🛰️ ORION | Order Risk & Intelligent Optimization Network
 NexGen Logistics Intelligence Command Center
-ORION is an AI-driven decision engine designed to transform reactive logistics into a predictive "Command Center." Built for NexGen Logistics Pvt. Ltd., it unifies 7+ fragmented datasets to solve the Tri-Factor Optimization challenge: Balancing Profitability, Sustainability (Carbon), and Customer Lifetime Value (CLV).
+📌 1. Project Overview & Problem Statement
+The Mission: To transform NexGen Logistics from reactive operations to a predictive "Command Center."
 
-📌 Business Context & Problem Statement
-NexGen Logistics operates across India and international hubs (Singapore, Dubai, etc.), but faces critical threats:
+The Core Problem: * Data Silos: Logistics data is scattered across 7+ inconsistent CSV files.
 
-Performance Gaps: Actual delivery times consistently exceed promised windows.
+Performance Gaps: Significant delays between "Promised" vs. "Actual" delivery dates.
 
-Cost Pressures: High overheads in fuel, labor, and maintenance.
+Sustainability Blindness: High operational costs paired with a lack of CO2 emission transparency.
 
-The "Data Silo" Effect: Information is scattered across inconsistent CSV files, leading to "invisible" revenue at risk.
+Revenue Risk: High-value customers (High CLV) are often impacted by unmonitored traffic and weather delays.
 
-ORION bridges these gaps by identifying at-risk customers and suggesting interventions before the delivery failure occurs.
+⚙️ 2. The "Self-Healing" Data Pipeline
+To handle real-world data inconsistencies, ORION uses a robust backend engine featuring:
 
-🛠️ Innovation: The "Self-Healing" Pipeline
-Real-world data is messy. ORION’s backend includes a Data Integrity Audit layer that handles:
+Fuzzy Column Mapping: Automatically resolves naming mismatches (e.g., "order_val" vs "Order_Value_INR") and handles whitespace/casing issues.
 
-Fuzzy Column Mapping: Automatically resolves whitespace, casing, and naming inconsistencies (e.g., "CO2 Emissions" vs "carbon_kg").
+Dynamic Asset Injection: If a dataset is missing a vehicle_type, the engine uses a weighted random distribution from the fleet database to maintain integrity.
 
-Schema Integration: Uses multi-way left joins to ensure "In-Transit" orders are preserved, reflecting true operational state.
+Multi-Way Schema Integration: Performs complex Left Joins on Order_ID to ensure recent "In-Transit" orders are included in the analysis.
 
-Feature Engineering:
+Automated Sanitization: Cleans outliers in order values and fills missing coordinates for geospatial mapping.
 
-CLV Score: (Order_Value / Max) * 0.7 + (Rating / 5) * 0.3.
+🧬 3. Advanced Feature Engineering
+ORION creates three proprietary metrics to drive decision-making:
 
-Failure Propensity: Dynamic risk scoring based on traffic volatility and carrier history.
+Tri-Factor Optimization Score: A balanced metric weighing Profit, Carbon Footprint, and Time.
 
-Carbon-to-Cost Calculator: Shows the real-time financial trade-off for choosing "Green" carriers.
+Dynamic CLV Score: * Formula: (Order_Value / Max_Value * 70) + (Customer_Rating / 5 * 30).
 
-📊 Dashboard Features
-1. Geospatial Carbon & Emission Hotspots
-Using PyDeck, ORION visualizes "Emission Hotspots." The heatmap density is driven by Carbon_Impact, allowing managers to pinpoint where the fleet is most carbon-intensive.
+Purpose: Identifies high-priority customers for "White-Glove" service recovery.
 
-2. Risk Propensity Matrix
-An interactive Plotly scatter plot:
+Carbon Impact Tracker: * Formula: Distance_KM * CO2_Factor_per_Vehicle_Type.
 
-X-Axis: Distance | Y-Axis: Cost.
+Purpose: Provides real-time visibility into the environmental cost of every delivery.
 
-Bubble Size: CLV_Score (Prioritizes high-value customers).
+📊 4. Interactive Dashboard Features
+🌐 Geospatial Emission Hotspots: A PyDeck-powered heatmap identifying high-pollution transit corridors.
 
-Color: Risk_Level (Flags orders delayed by traffic/weather).
+⚠️ Risk Propensity Matrix: A Plotly scatter plot mapping Distance vs. Cost, sized by CLV Score and colored by Risk Level.
 
-3. Warehouse Inventory "Health" Tracker
-Monitors stock levels against reorder points to prevent stockouts of high-demand 'Industrial' goods.
+📦 Warehouse Health Tracker: Visualizes inventory stock levels against reorder points to prevent stockouts of critical industrial goods.
 
-4. AI Intervention Agent
-A logic-driven module that scans for "High Risk" orders and provides Explainable AI (XAI) Badges (e.g., "Prioritized due to high churn risk").
+🤖 AI Intervention Agent: * Scans for "High Risk" deliveries.
 
-🏗️ Technical Architecture
-Core Logic: Python (Pandas, NumPy).
+Provides Explainable AI (XAI) Badges explaining why an order is flagged (e.g., "High Traffic + Fragile Cargo").
 
-Interface: Streamlit (Dynamic Web Framework).
+Includes a "Fix All Risks" optimization trigger.
 
-Visualizations: Plotly, PyDeck.
+💻 5. Technical Stack
+Language: Python 3.8+
 
-Data: 7-Layered CSV Ecosystem (Orders, Performance, Routes, Fleet, Inventory, Costs, Feedback).
+Framework: Streamlit (Web Interface)
 
-📈 Business Impact
-15–20% Cost Reduction: Through identification of cost leakage and optimized vehicle-to-order matching.
+Data Science: Pandas (Wrangling), NumPy (Calculations)
 
-Sustainability Transparency: Real-time CO2 tracking for "Green Max" optimization.
+Visualization: Plotly (Interactive Charts), PyDeck (Mapping), Mapbox (Satellite Layer)
 
-Revenue Protection: Proactive intervention for high-CLV customers who are at risk of late delivery.
+📈 6. Business Impact & ROI
+Cost Reduction: Targets a 15–20% decrease in operational overhead through optimized vehicle-to-order matching.
 
-🚀 Installation & Setup
-Clone: git clone https://github.com/Harshitgautam93/ORION_Project
+Revenue Protection: Proactively saves high-value orders from failure, reducing churn.
 
-Install: pip install -r requirements.txt
+Sustainability: Enables a data-driven transition to EVs by highlighting the highest CO2-producing routes.
 
-Run: streamlit run frontend/app.py
+Operational Speed: Consolidates 7 separate reports into a single, real-time "Pulse" KPI row.
 
-🗺️ Roadmap
-Predictive Maintenance: Automated alerts when fuel efficiency drops by >10%.
+🛠️ 7. Installation & Setup
+Clone Repository: ```bash git clone https://github.com/Harshitgautam93/ORION_Project
 
-What-if Sandboxes: Simulation sliders for fuel price hikes or carbon tax impacts.
+Install Requirements: ```bash pip install -r requirements.txt
 
-NLP AI Agent: Ask "What is the revenue impact of switching Delhi orders to BlueDart?"
+Launch App: ```bash streamlit run frontend/app.py
 
-Developed as a Strategic Decision Support System for NexGen Logistics.
 
-- <img width="1870" height="757" alt="Screenshot 2025-12-19 104857" src="https://github.com/user-attachments/assets/51678000-0650-4f05-9db7-31c652defbcc" />
-<img width="1896" height="810" alt="Screenshot 2025-12-19 104833" src="https://github.com/user-attachments/assets/2b78b9d2-a646-49b1-90a9-044c7658964e" />
-<img width="1355" height="695" alt="Screenshot 2025-12-19 104738" src="https://github.com/user-attachments/assets/a04f09fb-b7e8-4ba4-bf36-657decb88e8d" />
-<img width="1866" height="736" alt="Screenshot 2025-12-19 104724" src="https://github.com/user-attachments/assets/21f9b50f-82e7-4380-9531-b9d8da0f05aa" />
-<img width="1817" height="758" alt="Screenshot 2025-12-19 104702" src="https://github.com/user-attachments/assets/6eb9e550-b084-4149-84cf-fc4dc71b67c2" />
-<img width="1358" height="646" alt="Screenshot 2025-12-19 102337" src="https://github.com/user-attachments/assets/049824e5-983f-484d-b411-1243e107c4d4" />
+🗺️ 8. Future Roadmap
+NLP AI Agent: Integration to allow queries like "What is the revenue impact of a 10% fuel hike?"
+
+Predictive Maintenance: Automated alerts when a vehicle's fuel efficiency drops below the fleet average.
+
+What-if Sandboxes: Simulation sliders for testing the impact of new carbon taxes or labor cost changes.
+
+Developed for the ORION Logistics Intelligence Challenge.
