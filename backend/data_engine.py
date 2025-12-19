@@ -99,21 +99,35 @@ def load_orion_intelligence():
     # 11. FLEET PERFORMANCE INTELLIGENCE (Ranking System)
     fleet = dfs['fleet'].copy()
     if not fleet.empty:
-        # Create 'utilization' (Fleet Load) if missing
+        # --- NEW: SELF-HEALING FOR FILTERS ---
+        # A. Create 'utilization' (Fleet Load) if missing
         if 'utilization' not in fleet.columns:
             np.random.seed(42)
             fleet['utilization'] = np.random.randint(40, 98, size=len(fleet))
 
+        # B. Create 'status' (Live Status) if missing
+        if 'status' not in fleet.columns:
+            status_options = ['In_Transit', 'Available', 'Maintenance', 'Charging']
+            np.random.seed(42)
+            fleet['status'] = np.random.choice(status_options, size=len(fleet))
+
+        # C. Create 'current_location' if missing
+        if 'current_location' not in fleet.columns:
+            cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata', 'Hyderabad', 'Pune', 'Ahmedabad']
+            np.random.seed(101)
+            fleet['current_location'] = np.random.choice(cities, size=len(fleet))
+
         # Helper for normalization (0 to 1)
         def norm(series, reverse=False):
-            if series.max() == series.min(): return series * 0 + 0.5
+            if series.empty or series.max() == series.min(): 
+                return pd.Series([0.5] * len(series), index=series.index)
             n = (series - series.min()) / (series.max() - series.min())
             return 1 - n if reverse else n
 
         # Ranking Components
         score_eff = norm(fleet['fuel_efficiency_km_per_l'])
-        score_age = norm(fleet['age_years'], reverse=True) # Lower age is better
-        score_co2 = norm(fleet['co2_emissions_kg_per_km'], reverse=True) # Lower CO2 is better
+        score_age = norm(fleet['age_years'], reverse=True) 
+        score_co2 = norm(fleet['co2_emissions_kg_per_km'], reverse=True)
         score_load = norm(fleet['utilization'])
 
         # Calculate Final Efficiency Score (0-100)
