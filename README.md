@@ -178,5 +178,6 @@ ORION demonstrates how AI-driven decision intelligence can unify cost optimizati
 <img width="1882" height="719" alt="Screenshot 2025-12-19 122208" src="https://github.com/user-attachments/assets/63ff2016-2b42-4777-8427-26f3c9f912d3" />
 <img width="1829" height="702" alt="Screenshot 2025-12-19 122133" src="https://github.com/user-attachments/assets/e1827cae-6692-40f8-bc0b-a1b848eb5b1c" />
 <img width="1818" height="720" alt="Screenshot 2025-12-19 122104" src="https://github.com/user-attachments/assets/c79a8876-acc3-4177-add3-57220711023d" />
-<img width="9432" height="3626" alt="ORION - ARCHITECTURE DIAGRAM" src="https://github.com/user-attachments/assets/d229cda7-c6c0-459a-81bf-1b1447f5fa7a" />
+<img width="1600" height="615" alt="image" src="https://github.com/user-attachments/assets/3f73b8d5-6bef-4531-a737-13c7f25c4057" />
+
 
